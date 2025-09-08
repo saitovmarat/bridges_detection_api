@@ -6,7 +6,7 @@ from typing import Optional
 
 from ..infrastructure.depth_estimator import DepthEstimator
 from ..use_cases.process_frame import process_frame
-from ..utils.model_loader import load_model
+from ..utils.load_model import load_model
 
 
 _shutdown_event = threading.Event()
@@ -14,18 +14,13 @@ _cache = {}
 
 
 def _signal_handler(signum: int, _):
-    """Обработчик сигналов для остановки сервера"""
-    print(
-        f"\n🛑 Получен сигнал {signal.Signals(signum).name}. Останавливаю сервер...")
+    signal_name = signal.Signals(signum).name
+    print(f"\n🛑 Получен сигнал {signal_name}. Останавливаю сервер...")
     _shutdown_event.set()
 
-
-def run_udp_server(host: str = "0.0.0.0", port: int = 9999):
-    """
-    Запускает UDP-сервер для приёма кадров, детекции мостов и отправки результатов.
-    Сервер можно остановить через Ctrl+C
-    """
+def run_command_server_udp(host: str = "0.0.0.0", port: int = 9999):
     signal.signal(signal.SIGINT, _signal_handler)  # Ctrl+C
+    signal.signal(signal.SIGTERM, _signal_handler) # kill, docker stop и т.д.
 
     try:
         bridge_detection_model = load_model("bridge_weights.pt")
@@ -67,15 +62,13 @@ def run_udp_server(host: str = "0.0.0.0", port: int = 9999):
                     except Exception as e:
                         response = {"error": "Processing failed",
                                     "details": str(e)}
-                # try:
+                
                 response_bytes = json.dumps(
                     response,
                     ensure_ascii=False,
                     separators=(',', ':')
                 ).encode('utf-8')
                 sock.sendto(response_bytes, addr)
-                # except Exception as e:
-                #     print(f"❌ Не удалось отправить ответ: {e}")
 
             except socket.timeout:
                 continue

@@ -114,5 +114,4 @@ images/
 testing
 runs
 
-*.png
 *.npy

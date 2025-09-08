@@ -22,9 +22,6 @@ class DepthEstimator(DepthEstimatorInterface):
                 "isl-org/MiDaS", "transforms").dpt_transform   # type: ignore
 
     def estimate(self, image: np.ndarray) -> np.ndarray:
-        """
-        Оценка карты глубины для входного изображения (numpy array, HxWxC, BGR).
-        """
         img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         input_batch = self.transform(img_rgb).to(self.device)

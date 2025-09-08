@@ -4,7 +4,6 @@ import base64
 import numpy as np
 from typing import Any, Dict
 
-
 from .get_target_point import get_target_point
 from ..domain.detector_interface import DetectorInterface
 from ..domain.depth_estimator_interface import DepthEstimatorInterface
