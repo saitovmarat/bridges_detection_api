@@ -4,7 +4,7 @@ import signal
 import threading
 from typing import Optional
 
-from ..infrastructure.depth_estimator import DepthEstimator
+from ..infrastructure.depth_anything_depth_estimator import DepthAnythingDepthEstimator
 from ..use_cases.process_frame import process_frame
 from ..utils.load_model import load_model
 
@@ -25,7 +25,7 @@ def run_command_server_udp(host: str = "0.0.0.0", port: int = 9999):
     try:
         bridge_detection_model = load_model("bridge_weights.pt")
         arch_gap_detection_model = load_model("arch_void_weights.pt")
-        depth_estimator = DepthEstimator()
+        depth_estimator = DepthAnythingDepthEstimator()
         print("🧠 Модель загружена")
     except Exception as e:
         print(f"❌ Ошибка загрузки модели: {e}")

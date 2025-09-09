@@ -45,8 +45,6 @@ def get_target_point(
         if depth_map is None or depth_map.size == 0:
             return cache.get("target_point_for_flight")
 
-        depth_map = cv2.bilateralFilter(
-            depth_map, d=9, sigmaColor=75, sigmaSpace=75)
         farthest_idx = np.unravel_index(np.argmin(depth_map), depth_map.shape)
 
         global_x = x1 + farthest_idx[1]

@@ -1,7 +1,8 @@
 from flask import Blueprint, abort, request, Response
 import cv2
 
-from ..infrastructure.depth_estimator import DepthEstimator
+from ..infrastructure.midas_depth_estimator import MidasDepthEstimator
+from ..infrastructure.depth_anything_depth_estimator import DepthAnythingDepthEstimator
 from ..use_cases.generate_depth_map import get_depth_map_from_image
 from ..utils.request_parsing import get_frame_from_request
 from ..utils.image_utils import decode_base64_image
@@ -14,7 +15,7 @@ blueprint = Blueprint('depth_api', __name__, url_prefix='/depth')
 def get_or_create_depth_estimator():
     global _depth_estimator_instance
     if _depth_estimator_instance is None:
-        _depth_estimator_instance = DepthEstimator()
+        _depth_estimator_instance = DepthAnythingDepthEstimator()
     return _depth_estimator_instance
 
 @blueprint.route('', methods=['POST'])
@@ -27,6 +28,7 @@ def get_depth_map():
     except ValueError as e:
         abort(400, description=str(e))
     except Exception as e:
+        print(f"❌ SERVER ERROR: {str(e)}") 
         abort(500, description=f"Depth estimation failed: {str(e)}")
 
     success, png_buffer = cv2.imencode('.png', depth_map)
