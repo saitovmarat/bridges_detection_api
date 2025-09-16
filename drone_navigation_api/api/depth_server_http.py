@@ -1,3 +1,5 @@
+import threading
+import time
 from flask import Blueprint, abort, request, Response
 import cv2
 
@@ -20,6 +22,11 @@ def get_or_create_depth_estimator():
 
 @blueprint.route('', methods=['POST'])
 def get_depth_map():
+    print(f"🧵 Threads during request: {threading.active_count()}")
+    start_time = time.time()
+    thread_id = threading.get_ident()
+    print(f"🧵 [{thread_id}] Начал обработку запроса в {time.strftime('%H:%M:%S')}")
+
     try:
         depth_estimator = get_or_create_depth_estimator()
         b64_image = get_frame_from_request(request)
@@ -35,6 +42,7 @@ def get_depth_map():
     if not success:
         abort(500, description="Failed to encode depth map to PNG")
 
+    print(f"🧵 [{thread_id}] Завершил за {time.time() - start_time:.2f} сек")
     return Response(
         png_buffer.tobytes(),
         mimetype='image/png',

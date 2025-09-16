@@ -57,11 +57,11 @@ class DepthAnythingDepthEstimator(DepthEstimatorInterface):
 
         depth_map = depth_map.astype(np.float32)
 
-        depth_map = cv2.bilateralFilter(
-            depth_map,
-            d=9,
-            sigmaColor=75,
-            sigmaSpace=75
-        )
+        #depth_map = cv2.bilateralFilter(
+        #    depth_map,
+        #    d=9,
+        #    sigmaColor=75,
+        #    sigmaSpace=75
+        #)
 
         return depth_map

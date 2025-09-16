@@ -1,4 +1,5 @@
 import click
+from sympy import threaded
 from .app import create_command_udp_server, create_depth_http_server
 
 

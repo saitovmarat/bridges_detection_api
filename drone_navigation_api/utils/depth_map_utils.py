@@ -11,8 +11,6 @@ def normalize_and_convert_to_uint16(
     if depth_map.dtype == np.uint16:
         return depth_map
 
-    print(f"⚠️ [CONVERT] Converting from {depth_map.dtype} to uint16...")
-
     depth_min = depth_map.min()
     depth_max = depth_map.max()
 

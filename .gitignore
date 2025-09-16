@@ -115,3 +115,4 @@ testing
 runs
 
 *.npy
+*.pth

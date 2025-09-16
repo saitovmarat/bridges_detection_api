@@ -33,37 +33,37 @@ def process_frame(
     try:
         bridge_detections = bridge_detector.detect(image)
         update_object_confirmation("bridge", bridge_detections, cache)
-        
-        if not is_bridge_confirmed(cache):
-            result = {
-                "status": "detecting",
-                "detections": [det.to_dict() for det in bridge_detections],
-                "target_point": {}
-            }
-        else:
-            arch_gap_detections = arch_gap_detector.detect(image)
-            update_object_confirmation("arch_gap", arch_gap_detections, cache)
-            
-            if is_tracking_lost("arch_gap", cache):
-                reset_confirmation_state(cache)
-                result = {
-                    "status": "detecting",
-                    "detections": [det.to_dict() for det in bridge_detections],
-                    "target_point": {}
-                }
-            else:
+
+        arch_gap_detections = arch_gap_detector.detect(image)
+        update_object_confirmation("arch_gap", arch_gap_detections, cache)
+
+        target_point = None
+        if arch_gap_detections:
+            try:
                 target_point = get_target_point(
                     image=image,
                     depth_estimator=depth_estimator,
                     arch_gap_detections=arch_gap_detections,
                     cache=cache
-                ) if arch_gap_detections else None
-                
-                result = {
-                    "status": "bridge_confirmed",
-                    "detections": [det.to_dict() for det in arch_gap_detections],
-                    "target_point": target_point.to_dict() if target_point else {}
-                }
+                )
+            except Exception as e:
+                print(f"⚠️ Ошибка расчёта target_point: {e}")
+
+        if not is_bridge_confirmed(cache):
+            status = "detecting"
+            detections = [det.to_dict() for det in bridge_detections]
+        elif is_tracking_lost("arch_gap", cache):
+            status = "tracking_lost"
+            detections = [det.to_dict() for det in arch_gap_detections]
+        else:
+            status = "bridge_confirmed"
+            detections = [det.to_dict() for det in arch_gap_detections]
+
+        result = {
+            "status": status,
+            "detections": detections,
+            "target_point": target_point.to_dict() if target_point else {}
+        }
 
     except Exception as e:
         return {"error": "Processing failed", "details": str(e)}
